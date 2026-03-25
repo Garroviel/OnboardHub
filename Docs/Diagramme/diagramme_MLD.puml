@@ -1,0 +1,115 @@
+@startuml MLD
+hide circle
+skinparam classAttributeIconSize 0
+
+class COMPANY <<table>> {
+  id PK
+  name
+  slug UQ
+  created_at
+}
+
+class TEAM <<table>> {
+  id PK
+  company_id FK
+  name
+  created_at
+  (company_id, name) UQ
+}
+
+class USER <<table>> {
+  id PK
+  company_id FK
+  team_id FK (nullable)
+  manager_id FK (nullable)
+  email
+  first_name
+  last_name
+  role
+  provider
+  external_id
+  hired_at (nullable)
+  created_at
+  (company_id, email) UQ
+  (provider, external_id) UQ
+}
+
+class ONBOARDING <<table>> {
+  id PK
+  user_id FK
+  start_date
+  due_date (nullable)
+  status
+  progress_percent
+  template_id (nullable, future)
+  created_at
+}
+
+class ONBOARDING_TASK <<table>> {
+  id PK
+  onboarding_id FK
+  assigned_by_user_id FK (nullable)
+  title
+  description (nullable)
+  status
+  priority
+  due_date (nullable)
+  completed_at (nullable)
+  position
+}
+
+class ONBOARDING_TRAINING <<table>> {
+  id PK
+  onboarding_id FK
+  title
+  url (nullable)
+  status
+  completed_at (nullable)
+  position
+}
+
+class ONBOARDING_SOFTWARE <<table>> {
+  id PK
+  onboarding_id FK
+  name
+  install_url (nullable)
+  status
+  completed_at (nullable)
+  position
+}
+
+class TECH_ARTICLE <<table>> {
+  id PK
+  source
+  external_id
+  title
+  url
+  author (nullable)
+  score (nullable)
+  published_at (nullable)
+  fetched_at
+  (source, external_id) UQ
+}
+
+class USER_TECH_STATE <<table>> {
+  id PK
+  user_id FK
+  article_id FK
+  is_read
+  read_at (nullable)
+  is_saved
+  saved_at (nullable)
+  (user_id, article_id) UQ
+}
+
+COMPANY "1" -- "0..*" TEAM
+COMPANY "1" -- "0..*" USER
+TEAM "0..1" -- "0..*" USER
+USER "0..1" -- "0..*" USER : manages
+USER "1" -- "0..*" ONBOARDING
+ONBOARDING "1" -- "0..*" ONBOARDING_TASK
+ONBOARDING "1" -- "0..*" ONBOARDING_TRAINING
+ONBOARDING "1" -- "0..*" ONBOARDING_SOFTWARE
+TECH_ARTICLE "1" -- "0..*" USER_TECH_STATE
+USER "1" -- "0..*" USER_TECH_STATE
+@enduml
