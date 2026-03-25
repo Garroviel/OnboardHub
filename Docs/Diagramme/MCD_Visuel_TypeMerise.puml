@@ -1,0 +1,136 @@
+@startuml MCD
+left to right direction
+hide circle
+skinparam linetype ortho
+skinparam ArrowColor #334155
+skinparam entityBorderColor #334155
+skinparam entityBackgroundColor #FFFFFF
+
+package "MVP — Release 1 (sans templates)" {
+
+  entity "COMPANY" as Company {
+    *id
+    --
+    name
+    slug
+    created_at
+  }
+
+  entity "TEAM" as Team {
+    *id
+    --
+    name
+    created_at
+  }
+
+  entity "USER" as User {
+    *id
+    --
+    email
+    first_name
+    last_name
+    role
+    provider
+    external_id
+    hired_at
+    created_at
+  }
+
+  entity "ONBOARDING" as Onboarding {
+    *id
+    --
+    start_date
+    due_date
+    status
+    progress_percent
+    template_id (nullable, future)
+    created_at
+  }
+
+  entity "ONBOARDING_TASK" as OTask {
+    *id
+    --
+    title
+    description
+    status
+    priority
+    due_date
+    completed_at
+    assigned_by_user_id
+    position
+  }
+
+  entity "ONBOARDING_TRAINING" as OTraining {
+    *id
+    --
+    title
+    url
+    status
+    completed_at
+    position
+  }
+
+  entity "ONBOARDING_SOFTWARE" as OSoftware {
+    *id
+    --
+    name
+    install_url
+    status
+    completed_at
+    position
+  }
+
+  entity "TECH_ARTICLE" as TechArticle {
+    *id
+    --
+    source
+    external_id
+    title
+    url
+    author
+    score
+    published_at
+    fetched_at
+  }
+
+  entity "USER_TECH_STATE" as TechState {
+    *id
+    --
+    is_read
+    read_at
+    is_saved
+    saved_at
+  }
+
+  ' --- Associations (avec noms + cardinalités) ---
+  Company  "1,1" -- "0,N" Team  : "possède"
+  Company  "1,1" -- "0,N" User  : "emploie"
+  Team     "0,1" -- "0,N" User  : "regroupe"
+
+  User     "0,1" -- "0,N" User  : "manage"  ' hiérarchie
+
+  User      "1,1" -- "0,N" Onboarding : "suit"
+  Onboarding "1,1" -- "0,N" OTask      : "contient"
+  Onboarding "1,1" -- "0,N" OTraining  : "contient"
+  Onboarding "1,1" -- "0,N" OSoftware  : "contient"
+
+  User       "1,1" -- "0,N" TechState  : "marque (lu/enregistré)"
+  TechArticle "1,1" -- "0,N" TechState : "est référencé par"
+}
+
+package "Optionnel — Release 2 (Templates onboarding)" {
+  entity "ONBOARDING_TEMPLATE" as Template {
+    *id
+    --
+    company_id
+    name
+    description
+    is_default
+    is_active
+    created_at
+  }
+}
+
+' Lien FUTUR (template_id) : affiché en pointillés pour montrer que c'est optionnel
+Onboarding "0,1" .. "0,N" Template : "est basé sur (future)"
+@enduml

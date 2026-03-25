@@ -1,0 +1,77 @@
+@startuml USE_CASE
+left to right direction
+
+actor "Collaborateur" as Collab
+actor "Manager" as Manager
+actor "RH" as HR
+actor "Admin (optionnel)" as Admin
+actor "API Auth externe\n(SSO/OAuth)" as AuthAPI
+actor "API HackerNews" as HNAPI
+
+rectangle "OnboardHub" {
+
+  usecase "Se connecter" as UC_Login
+  usecase "Se déconnecter" as UC_Logout
+
+  usecase "Accéder au dashboard" as UC_Dashboard
+
+  usecase "Consulter mon onboarding" as UC_Onboarding
+  usecase "Consulter mes tâches" as UC_Tasks
+  usecase "Mettre à jour le statut d'une tâche" as UC_TaskUpdate
+
+  usecase "Consulter mes formations" as UC_Trainings
+  usecase "Valider une formation" as UC_TrainingDone
+
+  usecase "Consulter mes installations" as UC_Software
+  usecase "Valider une installation" as UC_SoftwareDone
+
+  usecase "Consulter la veille techno" as UC_Tech
+  usecase "Marquer un article lu / enregistré" as UC_TechState
+
+  usecase "Voir la progression d'un collaborateur" as UC_Progress
+  usecase "Créer / éditer un onboarding (manuel)" as UC_AdminOnboarding
+  usecase "Assigner une tâche à un collaborateur" as UC_AssignTask
+
+  usecase "Gérer utilisateurs / équipes" as UC_AdminOrg
+}
+
+' Connexion : via API externe
+Collab --> UC_Login
+Manager --> UC_Login
+HR --> UC_Login
+Admin --> UC_Login
+AuthAPI <-- UC_Login
+
+' Déconnexion
+Collab --> UC_Logout
+Manager --> UC_Logout
+HR --> UC_Logout
+Admin --> UC_Logout
+
+' Parcours collaborateur
+Collab --> UC_Dashboard
+Collab --> UC_Onboarding
+Collab --> UC_Tasks
+Collab --> UC_TaskUpdate
+Collab --> UC_Trainings
+Collab --> UC_TrainingDone
+Collab --> UC_Software
+Collab --> UC_SoftwareDone
+Collab --> UC_Tech
+Collab --> UC_TechState
+
+' Parcours manager / RH
+Manager --> UC_Progress
+Manager --> UC_AssignTask
+
+HR --> UC_Progress
+HR --> UC_AdminOnboarding
+HR --> UC_AssignTask
+
+' Admin (optionnel)
+Admin --> UC_AdminOrg
+
+' Veille : via API externe
+HNAPI <-- UC_Tech
+
+@enduml
