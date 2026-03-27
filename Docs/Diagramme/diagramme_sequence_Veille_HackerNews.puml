@@ -1,0 +1,46 @@
+@startuml Veille_HackerNews
+actor "Collaborateur" as U
+boundary "Navigateur (UI)" as UI
+control "TechController" as C
+control "TechFeedService" as S
+control "TechArticleRepository" as R
+entity "HackerNewsClient" as HNC
+entity "API HackerNews" as HNAPI
+database "MySQL" as DB
+
+U -> UI : Ouvre "Veille techno"
+UI -> C : GET /tech
+C -> S : getFeed()
+
+S -> R : findFreshArticles(source="HN", maxAge)
+R -> DB : SELECT ... WHERE fetched_at >= NOW() - maxAge
+DB --> R : articles (liste ou vide)
+R --> S : articles
+
+alt Cache valide
+  S --> C : articles
+else Cache vide/expiré
+  S -> HNC : fetchTopStories()
+  HNC -> HNAPI : GET /topstories.json
+  HNAPI --> HNC : [ids]
+
+  loop pour chaque id (N)
+    HNC -> HNAPI : GET /item/{id}.json
+    HNAPI --> HNC : item JSON
+  end
+
+  HNC --> S : articles normalisés
+
+  alt API OK + parsing OK
+    S -> R : upsertArticles(articles)
+    R -> DB : INSERT/UPDATE tech_article
+    DB --> R : OK
+    S --> C : articles
+  else API indisponible / erreur parsing
+    S --> C : liste vide + message "mode dégradé"
+  end
+end
+
+C --> UI : Render Twig (liste + message)
+UI --> U : Page affichée
+@enduml
