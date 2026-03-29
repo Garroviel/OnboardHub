@@ -1,0 +1,50 @@
+@startuml task_complete
+actor "Collaborateur" as U
+boundary "Navigateur (UI)" as UI
+control "TaskController" as C
+control "OnboardingService" as S
+control "ProgressService" as P
+control "OnboardingTaskRepository" as TaskRepo
+control "OnboardingRepository" as OnbRepo
+database "MySQL" as DB
+
+U -> UI : Clic "Marquer terminée"
+UI -> C : POST /tasks/{taskId}/complete
+
+C -> S : completeTask(taskId, currentUserId)
+
+' 1) Charger la tâche
+S -> TaskRepo : findWithOnboarding(taskId)
+TaskRepo -> DB : SELECT task + onboarding + user_id
+DB --> TaskRepo : task + onboarding(user_id)
+TaskRepo --> S : task + onboarding
+
+' 2) Vérifier la propriété
+alt Tâche n'appartient pas au user
+  S --> C : AccessDenied (403)
+  C --> UI : 403 / message "Accès refusé"
+else OK (ownership validé)
+  ' 3) Mettre à jour la tâche
+  S -> DB : UPDATE onboarding_task SET status='DONE', completed_at=NOW()
+  DB --> S : OK
+
+  ' 4) Recalcul progression
+  S -> P : computeProgress(onboardingId)
+
+  P -> OnbRepo : getItemsCounts(onboardingId)
+  OnbRepo -> DB : COUNT total & done (tasks+trainings+software)
+  DB --> OnbRepo : counts
+  OnbRepo --> P : counts
+
+  P --> S : progressPercent = round(done/total*100)
+
+  ' 5) Sauvegarder progression
+  S -> DB : UPDATE onboarding SET progress_percent=...
+  DB --> S : OK
+
+  ' 6) Retour UI
+  S --> C : OK
+  C --> UI : Redirect + flash "Tâche terminée"
+end
+
+@enduml

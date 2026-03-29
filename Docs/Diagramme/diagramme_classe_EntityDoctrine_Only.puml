@@ -1,0 +1,107 @@
+@startuml Diagramme_classe_Entity_doctrine
+skinparam classAttributeIconSize 0
+left to right direction
+
+package "Entity (Doctrine)" {
+  class Company {
+    +id
+    +name
+    +slug
+    +createdAt
+  }
+
+  class Team {
+    +id
+    +name
+    +createdAt
+  }
+
+  class User {
+    +id
+    +email
+    +firstName
+    +lastName
+    +role
+    +provider
+    +externalId
+    +hiredAt
+    +createdAt
+  }
+
+  class Onboarding {
+    +id
+    +startDate
+    +dueDate
+    +status
+    +progressPercent
+    +templateId (nullable, future)
+    +createdAt
+  }
+
+  class OnboardingTask {
+    +id
+    +title
+    +description
+    +status
+    +priority
+    +dueDate
+    +completedAt
+    +position
+  }
+
+  class OnboardingTraining {
+    +id
+    +title
+    +url
+    +status
+    +completedAt
+    +position
+  }
+
+  class OnboardingSoftware {
+    +id
+    +name
+    +installUrl
+    +status
+    +completedAt
+    +position
+  }
+
+  class TechArticle {
+    +id
+    +source
+    +externalId
+    +title
+    +url
+    +author
+    +score
+    +publishedAt
+    +fetchedAt
+  }
+
+  class UserTechState {
+    +id
+    +isRead
+    +readAt
+    +isSaved
+    +savedAt
+  }
+
+  ' Relations data
+  Company "1" -- "0..*" Team : possède
+  Company "1" -- "0..*" User : emploie
+
+  Team "0..1" -- "0..*" User : regroupe
+  User "0..1" -- "0..*" User : manage
+
+  User "1" -- "0..*" Onboarding : suit
+  Onboarding "1" -- "0..*" OnboardingTask : contient
+  Onboarding "1" -- "0..*" OnboardingTraining : contient
+  Onboarding "1" -- "0..*" OnboardingSoftware : contient
+
+  TechArticle "1" -- "0..*" UserTechState : état
+  User "1" -- "0..*" UserTechState : marque
+}
+
+
+@enduml
