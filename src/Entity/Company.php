@@ -6,8 +6,11 @@ use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ORM\Table(name: 'company')]
+#[ORM\UniqueConstraint(name: 'uq_company_slug', columns: ['slug'])]
 class Company
 {
     #[ORM\Id]
@@ -16,13 +19,23 @@ class Company
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 128)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 128)]
     private ?string $slug = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    /**
+     * @var Collection<int, Team>
+     */
+    #[ORM\OneToMany(targetEntity: Team::class, mappedBy: 'company')]
+    private Collection $teams;
 
     /**
      * @var Collection<int, User>
@@ -32,7 +45,9 @@ class Company
 
     public function __construct()
     {
+        $this->teams = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -77,6 +92,35 @@ class Company
     }
 
     /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            if ($team->getCompany() === $this) {
+                $team->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, User>
      */
     public function getUsers(): Collection
@@ -96,12 +140,7 @@ class Company
 
     public function removeUser(User $user): static
     {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getCompany() === $this) {
-                $user->setCompany(null);
-            }
-        }
+        $this->users->removeElement($user);
 
         return $this;
     }

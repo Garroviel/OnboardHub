@@ -6,8 +6,11 @@ use App\Repository\TeamRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TeamRepository::class)]
+#[ORM\Table(name: 'team')]
+#[ORM\UniqueConstraint(name: 'uq_team_company_name', columns: ['company_id', 'name'])]
 class Team
 {
     #[ORM\Id]
@@ -15,7 +18,13 @@ class Team
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'teams')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Company $company = null;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -30,11 +39,24 @@ class Team
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -82,7 +104,6 @@ class Team
     public function removeUser(User $user): static
     {
         if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
             if ($user->getTeam() === $this) {
                 $user->setTeam(null);
             }

@@ -98,6 +98,11 @@ class User
         return $this;
     }
 
+	public function getFullName(): string
+	{
+		return trim($this->firstName . ' ' . $this->lastName);
+	}
+
     public function getRole(): ?string
     {
         return $this->role;
