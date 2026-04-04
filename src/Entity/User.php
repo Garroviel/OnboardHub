@@ -2,12 +2,18 @@
 
 namespace App\Entity;
 
+use App\Enum\UserRole;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: 'users')]
+#[ORM\UniqueConstraint(name: 'uq_users_company_email', columns: ['company_id', 'email'])]
+#[ORM\UniqueConstraint(name: 'uq_users_provider_external', columns: ['provider', 'external_id'])]
 class User
 {
     #[ORM\Id]
@@ -15,36 +21,58 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Company $company = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Team $team = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'managedUsers')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?self $manager = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'manager')]
+    private Collection $managedUsers;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 255)]
     private ?string $email = null;
 
     #[ORM\Column(length: 120)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 120)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $lastName = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $role = null;
+    #[ORM\Column(enumType: UserRole::class)]
+    private ?UserRole $role = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
     private ?string $provider = null;
 
     #[ORM\Column(length: 128)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 128)]
     private ?string $externalId = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $hiredAt = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Company $company = null;
-
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Team $team = null;
 
     /**
      * @var Collection<int, Onboarding>
@@ -54,12 +82,79 @@ class User
 
     public function __construct()
     {
+        $this->managedUsers = new ArrayCollection();
         $this->onboardings = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getTeam(): ?Team
+    {
+        return $this->team;
+    }
+
+    public function setTeam(?Team $team): static
+    {
+        $this->team = $team;
+
+        return $this;
+    }
+
+    public function getManager(): ?self
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?self $manager): static
+    {
+        $this->manager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getManagedUsers(): Collection
+    {
+        return $this->managedUsers;
+    }
+
+    public function addManagedUser(self $user): static
+    {
+        if (!$this->managedUsers->contains($user)) {
+            $this->managedUsers->add($user);
+            $user->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeManagedUser(self $user): static
+    {
+        if ($this->managedUsers->removeElement($user)) {
+            if ($user->getManager() === $this) {
+                $user->setManager(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -69,7 +164,7 @@ class User
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $this->email = mb_strtolower($email);
 
         return $this;
     }
@@ -98,17 +193,17 @@ class User
         return $this;
     }
 
-	public function getFullName(): string
-	{
-		return trim($this->firstName . ' ' . $this->lastName);
-	}
+    public function getFullName(): string
+    {
+        return trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
+    }
 
-    public function getRole(): ?string
+    public function getRole(): ?UserRole
     {
         return $this->role;
     }
 
-    public function setRole(string $role): static
+    public function setRole(UserRole $role): static
     {
         $this->role = $role;
 
@@ -144,7 +239,7 @@ class User
         return $this->hiredAt;
     }
 
-    public function setHiredAt(\DateTimeImmutable $hiredAt): static
+    public function setHiredAt(?\DateTimeImmutable $hiredAt): static
     {
         $this->hiredAt = $hiredAt;
 
@@ -159,30 +254,6 @@ class User
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getCompany(): ?Company
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?Company $company): static
-    {
-        $this->company = $company;
-
-        return $this;
-    }
-
-    public function getTeam(): ?Team
-    {
-        return $this->team;
-    }
-
-    public function setTeam(?Team $team): static
-    {
-        $this->team = $team;
 
         return $this;
     }
@@ -208,7 +279,6 @@ class User
     public function removeOnboarding(Onboarding $onboarding): static
     {
         if ($this->onboardings->removeElement($onboarding)) {
-            // set the owning side to null (unless already changed)
             if ($onboarding->getUser() === $this) {
                 $onboarding->setUser(null);
             }
