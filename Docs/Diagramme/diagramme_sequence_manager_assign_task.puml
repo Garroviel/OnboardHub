@@ -1,0 +1,46 @@
+@startuml manager_assign_task
+actor "Manager" as M
+boundary "Navigateur (UI)" as UI
+control "AdminTaskController\n(or ManagerController)" as C
+control "TaskAssignmentService" as S
+control "OnboardingRepository" as OnbRepo
+control "OnboardingTaskRepository" as TaskRepo
+database "MySQL" as DB
+
+M -> UI : Remplit formulaire "Assigner une tâche"
+UI -> C : POST /admin/tasks/assign
+
+' 1) Vérifier le rôle (sécurité)
+C -> C : check role (ROLE_MANAGER / ROLE_HR / ROLE_ADMIN)
+
+alt Accès refusé
+  C --> UI : 403 / message
+else Accès OK
+  ' 2) Trouver l’onboarding actif du collaborateur
+  C -> S : assignTask(collabUserId, taskData, currentManagerId)
+
+  S -> OnbRepo : findActiveOnboarding(collabUserId)
+  OnbRepo -> DB : SELECT onboarding WHERE user_id=? AND status='ACTIVE'
+  DB --> OnbRepo : onboarding (ou null)
+  OnbRepo --> S : onboarding
+
+  alt Pas d'onboarding actif
+    S --> C : error "Onboarding inexistant"
+    C --> UI : Redirect + flash error
+  else Onboarding trouvé
+    ' 3) Créer la tâche onboarding
+    S -> TaskRepo : createTask(onboardingId, taskData, assignedBy=currentManagerId)
+    TaskRepo -> DB : INSERT onboarding_task (...)
+    DB --> TaskRepo : OK
+    TaskRepo --> S : taskId
+
+    ' 4) Option : recalcul progression (si besoin)
+    S -> DB : UPDATE onboarding.progress_percent (optionnel / recalcul async)
+    DB --> S : OK
+
+    S --> C : OK
+    C --> UI : Redirect + flash success
+  end
+end
+
+@enduml
