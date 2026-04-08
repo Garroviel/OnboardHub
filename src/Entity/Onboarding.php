@@ -45,15 +45,29 @@ class Onboarding
     /**
      * @var Collection<int, OnboardingTask>
      */
-    #[ORM\OneToMany(targetEntity: OnboardingTask::class, mappedBy: 'onboarding')]
-    private Collection $onboardingTasks;
+    #[ORM\OneToMany(mappedBy: 'onboarding', targetEntity: OnboardingTask::class)]
+    private Collection $tasks;
+
+    /**
+     * @var Collection<int, OnboardingTraining>
+     */
+    #[ORM\OneToMany(mappedBy: 'onboarding', targetEntity: OnboardingTraining::class)]
+    private Collection $trainings;
+
+    /**
+     * @var Collection<int, OnboardingSoftware>
+     */
+    #[ORM\OneToMany(mappedBy: 'onboarding', targetEntity: OnboardingSoftware::class)]
+    private Collection $softwareItems;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->status = OnboardingStatus::ACTIVE;
         $this->progressPercent = 0;
-        $this->onboardingTasks = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+        $this->trainings = new ArrayCollection();
+        $this->softwareItems = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -148,27 +162,84 @@ class Onboarding
     /**
      * @return Collection<int, OnboardingTask>
      */
-    public function getOnboardingTasks(): Collection
+    public function getTasks(): Collection
     {
-        return $this->onboardingTasks;
+        return $this->tasks;
     }
 
-    public function addOnboardingTask(OnboardingTask $onboardingTask): static
+    public function addTask(OnboardingTask $task): static
     {
-        if (!$this->onboardingTasks->contains($onboardingTask)) {
-            $this->onboardingTasks->add($onboardingTask);
-            $onboardingTask->setOnboarding($this);
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setOnboarding($this);
         }
 
         return $this;
     }
 
-    public function removeOnboardingTask(OnboardingTask $onboardingTask): static
+    public function removeTask(OnboardingTask $task): static
     {
-        if ($this->onboardingTasks->removeElement($onboardingTask)) {
-            // set the owning side to null (unless already changed)
-            if ($onboardingTask->getOnboarding() === $this) {
-                $onboardingTask->setOnboarding(null);
+        if ($this->tasks->removeElement($task)) {
+            if ($task->getOnboarding() === $this) {
+                $task->setOnboarding(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OnboardingTraining>
+     */
+    public function getTrainings(): Collection
+    {
+        return $this->trainings;
+    }
+
+    public function addTraining(OnboardingTraining $training): static
+    {
+        if (!$this->trainings->contains($training)) {
+            $this->trainings->add($training);
+            $training->setOnboarding($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTraining(OnboardingTraining $training): static
+    {
+        if ($this->trainings->removeElement($training)) {
+            if ($training->getOnboarding() === $this) {
+                $training->setOnboarding(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OnboardingSoftware>
+     */
+    public function getSoftwareItems(): Collection
+    {
+        return $this->softwareItems;
+    }
+
+    public function addSoftwareItem(OnboardingSoftware $softwareItem): static
+    {
+        if (!$this->softwareItems->contains($softwareItem)) {
+            $this->softwareItems->add($softwareItem);
+            $softwareItem->setOnboarding($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSoftwareItem(OnboardingSoftware $softwareItem): static
+    {
+        if ($this->softwareItems->removeElement($softwareItem)) {
+            if ($softwareItem->getOnboarding() === $this) {
+                $softwareItem->setOnboarding(null);
             }
         }
 

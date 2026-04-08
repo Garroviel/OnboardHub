@@ -80,10 +80,17 @@ class User
     #[ORM\OneToMany(targetEntity: Onboarding::class, mappedBy: 'user')]
     private Collection $onboardings;
 
+    /**
+     * @var Collection<int, UserTechState>
+     */
+    #[ORM\OneToMany(targetEntity: UserTechState::class, mappedBy: 'user')]
+    private Collection $techStates;
+
     public function __construct()
     {
         $this->managedUsers = new ArrayCollection();
         $this->onboardings = new ArrayCollection();
+        $this->techStates = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -281,6 +288,35 @@ class User
         if ($this->onboardings->removeElement($onboarding)) {
             if ($onboarding->getUser() === $this) {
                 $onboarding->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserTechState>
+     */
+    public function getTechStates(): Collection
+    {
+        return $this->techStates;
+    }
+
+    public function addTechState(UserTechState $techState): static
+    {
+        if (!$this->techStates->contains($techState)) {
+            $this->techStates->add($techState);
+            $techState->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTechState(UserTechState $techState): static
+    {
+        if ($this->techStates->removeElement($techState)) {
+            if ($techState->getUser() === $this) {
+                $techState->setUser(null);
             }
         }
 

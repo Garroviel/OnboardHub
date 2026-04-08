@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
+use App\Enum\TaskStatus;
 use App\Repository\OnboardingTaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OnboardingTaskRepository::class)]
+#[ORM\Table(name: 'onboarding_task')]
 class OnboardingTask
 {
     #[ORM\Id]
@@ -14,37 +17,71 @@ class OnboardingTask
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'tasks')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Onboarding $onboarding = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $assignedBy = null;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    #[ORM\Column(enumType: TaskStatus::class)]
+    private ?TaskStatus $status = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, options: ['unsigned' => true])]
     private ?int $priority = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dueDate = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $completedAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(options: ['unsigned' => true])]
     private ?int $position = null;
 
-    #[ORM\ManyToOne(inversedBy: 'onboardingTasks')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Onboarding $onboarding = null;
-
-    #[ORM\ManyToOne]
-    private ?User $assignedBy = null;
+    public function __construct()
+    {
+        $this->status = TaskStatus::TODO;
+        $this->priority = 3;
+        $this->position = 0;
+    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getOnboarding(): ?Onboarding
+    {
+        return $this->onboarding;
+    }
+
+    public function setOnboarding(?Onboarding $onboarding): static
+    {
+        $this->onboarding = $onboarding;
+
+        return $this;
+    }
+
+    public function getAssignedBy(): ?User
+    {
+        return $this->assignedBy;
+    }
+
+    public function setAssignedBy(?User $assignedBy): static
+    {
+        $this->assignedBy = $assignedBy;
+
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -71,12 +108,12 @@ class OnboardingTask
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?TaskStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(TaskStatus $status): static
     {
         $this->status = $status;
 
@@ -124,33 +161,9 @@ class OnboardingTask
         return $this->position;
     }
 
-    public function setPosition(?int $position): static
+    public function setPosition(int $position): static
     {
         $this->position = $position;
-
-        return $this;
-    }
-
-    public function getOnboarding(): ?Onboarding
-    {
-        return $this->onboarding;
-    }
-
-    public function setOnboarding(?Onboarding $onboarding): static
-    {
-        $this->onboarding = $onboarding;
-
-        return $this;
-    }
-
-    public function getAssignedBy(): ?User
-    {
-        return $this->assignedBy;
-    }
-
-    public function setAssignedBy(?User $assignedBy): static
-    {
-        $this->assignedBy = $assignedBy;
 
         return $this;
     }
