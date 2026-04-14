@@ -9,12 +9,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'uq_users_company_email', columns: ['company_id', 'email'])]
 #[ORM\UniqueConstraint(name: 'uq_users_provider_external', columns: ['provider', 'external_id'])]
-class User
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -322,4 +323,25 @@ class User
 
         return $this;
     }
+
+	public function getUserIdentifier(): string
+	{
+		return $this->email ?? '';
+	}
+
+	public function getRoles(): array
+	{
+		return match ($this->role) {
+			UserRole::ADMIN => ['ROLE_ADMIN', 'ROLE_HR', 'ROLE_MANAGER', 'ROLE_COLLABORATOR'],
+			UserRole::HR => ['ROLE_HR'],
+			UserRole::MANAGER => ['ROLE_MANAGER'],
+			UserRole::COLLABORATOR => ['ROLE_COLLABORATOR'],
+			default => [],
+		};
+	}
+
+	public function eraseCredentials(): void
+	{
+		// Rien à effacer pour le MVP mock SSO
+	}
 }
