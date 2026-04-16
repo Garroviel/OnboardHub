@@ -333,8 +333,8 @@ class User implements UserInterface
 	{
 		return match ($this->role) {
 			UserRole::ADMIN => ['ROLE_ADMIN', 'ROLE_HR', 'ROLE_MANAGER', 'ROLE_COLLABORATOR'],
-			UserRole::HR => ['ROLE_HR'],
-			UserRole::MANAGER => ['ROLE_MANAGER'],
+			UserRole::HR => ['ROLE_HR', 'ROLE_COLLABORATOR'],
+			UserRole::MANAGER => ['ROLE_MANAGER', 'ROLE_COLLABORATOR'],
 			UserRole::COLLABORATOR => ['ROLE_COLLABORATOR'],
 			default => [],
 		};
