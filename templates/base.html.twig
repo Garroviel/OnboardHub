@@ -1,17 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}OnboardHub{% endblock %}</title>
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <header class="site-header">
+            <div class="container header-inner">
+                <a href="{{ path('app_dashboard') }}" class="brand">OnboardHub</a>
+
+                <nav class="main-nav" aria-label="Navigation principale">
+                    {% if app.user %}
+                        <a href="{{ path('app_dashboard') }}">Dashboard</a>
+
+                        {% if is_granted('ROLE_MANAGER') or is_granted('ROLE_HR') or is_granted('ROLE_ADMIN') %}
+                            <span class="nav-badge">Pilotage</span>
+                        {% endif %}
+
+                        <span class="nav-user">
+                            {{ app.user.fullName }}
+                        </span>
+
+                        <a href="{{ path('app_logout') }}">Déconnexion</a>
+                    {% endif %}
+                </nav>
+            </div>
+        </header>
+
+        <main class="container page-content">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>

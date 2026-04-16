@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard collaborateur{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Bonjour {{ user.fullName }}</h1>
+        <p>Bienvenue sur votre espace d’onboarding.</p>
+    </section>
+
+    <section class="grid">
+        <article class="card">
+            <h2>Mon onboarding</h2>
+
+            {% if onboarding %}
+                <dl class="details-list">
+                    <div>
+                        <dt>Statut</dt>
+                        <dd>{{ onboarding.status.value }}</dd>
+                    </div>
+                    <div>
+                        <dt>Progression</dt>
+                        <dd>{{ onboarding.progressPercent }}%</dd>
+                    </div>
+                    <div>
+                        <dt>Date de début</dt>
+                        <dd>{{ onboarding.startDate|date('d/m/Y') }}</dd>
+                    </div>
+                    <div>
+                        <dt>Date cible</dt>
+                        <dd>
+                            {% if onboarding.dueDate %}
+                                {{ onboarding.dueDate|date('d/m/Y') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </dd>
+                    </div>
+                </dl>
+            {% else %}
+                <p>Aucun onboarding n’est encore associé à votre compte.</p>
+            {% endif %}
+        </article>
+
+        <article class="card">
+            <h2>Veille tech</h2>
+
+            {% if latestArticles is not empty %}
+                <ul class="simple-list">
+                    {% for article in latestArticles %}
+                        <li>
+                            <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+                                {{ article.title }}
+                            </a>
+                            <small>
+                                {{ article.source }}
+                                {% if article.score is not null %}· score {{ article.score }}{% endif %}
+                            </small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun article en cache pour le moment.</p>
+            {% endif %}
+        </article>
+    </section>
+{% endblock %}
