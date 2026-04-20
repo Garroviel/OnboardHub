@@ -194,3 +194,9 @@ a:hover {
         grid-template-columns: 1.3fr 1fr;
     }
 }
+
+.stack {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}

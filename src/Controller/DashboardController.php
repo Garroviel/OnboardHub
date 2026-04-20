@@ -34,10 +34,7 @@ final class DashboardController extends AbstractController
             ]);
         }
 
-        $onboarding = $onboardingRepository->findOneBy(
-            ['user' => $user],
-            ['createdAt' => 'DESC']
-        );
+        $onboarding = $onboardingRepository->findLatestForUserWithItems($user);
 
         return $this->render('dashboard/collaborator.html.twig', [
             'user' => $user,
