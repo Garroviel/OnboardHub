@@ -85,7 +85,16 @@
                             {% for task in onboarding.tasks %}
                                 <tr>
                                     <td>{{ task.title }}</td>
-                                    <td>{{ task.status.value }}</td>
+									<td>
+										<form method="post" action="{{ path('app_onboarding_task_update_status', {id: task.id}) }}">
+											<select name="status">
+												<option value="TODO" {% if task.status.value == 'TODO' %}selected{% endif %}>TODO</option>
+												<option value="IN_PROGRESS" {% if task.status.value == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
+												<option value="DONE" {% if task.status.value == 'DONE' %}selected{% endif %}>DONE</option>
+											</select>
+											<button type="submit">Mettre à jour</button>
+										</form>
+									</td>
                                     <td>{{ task.priority }}</td>
                                     <td>
                                         {% if task.dueDate %}
@@ -161,7 +170,15 @@
                             {% for software in onboarding.softwareItems %}
                                 <tr>
                                     <td>{{ software.name }}</td>
-                                    <td>{{ software.status.value }}</td>
+                                    <td>
+										<form method="post" action="{{ path('app_onboarding_software_update_status', {id: software.id}) }}">
+											<select name="status">
+												<option value="TODO" {% if software.status.value == 'TODO' %}selected{% endif %}>TODO</option>
+												<option value="DONE" {% if software.status.value == 'DONE' %}selected{% endif %}>DONE</option>
+											</select>
+											<button type="submit">Mettre à jour</button>
+										</form>
+									</td>
                                     <td>
                                         {% if software.installUrl %}
                                             <a href="{{ software.installUrl }}" target="_blank" rel="noopener noreferrer">
