@@ -200,3 +200,41 @@ a:hover {
     gap: 1.25rem;
     margin-top: 1.25rem;
 }
+
+form {
+    margin: 0;
+}
+
+select,
+button,
+input {
+    font: inherit;
+}
+
+select,
+input {
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+}
+
+button {
+    padding: 0.45rem 0.8rem;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.95;
+}
+
+td form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
