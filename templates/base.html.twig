@@ -21,6 +21,9 @@
 
                         <span class="nav-user">
                             {{ app.user.fullName }}
+							<small>
+								{{ app.user.roles|join(', ') }}
+							</small>
                         </span>
 
                         <a href="{{ path('app_logout') }}">Déconnexion</a>

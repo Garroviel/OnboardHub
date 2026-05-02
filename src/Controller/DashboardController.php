@@ -8,20 +8,39 @@ use App\Repository\TechArticleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\HackerNewsClient;
+use App\Service\TechArticleCacheManager;
 
 final class DashboardController extends AbstractController
 {
     #[Route('/', name: 'app_dashboard')]
     public function index(
         OnboardingRepository $onboardingRepository,
-        TechArticleRepository $techArticleRepository
+        TechArticleRepository $techArticleRepository,
+		HackerNewsClient $hnClient,
+    	TechArticleCacheManager $cacheManager
     ): Response {
         $user = $this->getUser();
 
         if (!$user) {
             throw $this->createAccessDeniedException('Utilisateur non authentifié.');
         }
+		
+		try {
+			$ids = $hnClient->getTopStoriesIds(5);
 
+			foreach ($ids as $id) {
+				$item = $hnClient->getItem($id);
+
+				if ($item) {
+					$cacheManager->saveIfNotExists($item);
+				}
+			}
+
+			$cacheManager->flush();
+		} catch (\Throwable) {
+			// mode dégradé : on ne fait rien
+		}
         $latestArticles = $techArticleRepository->findBy([], ['publishedAt' => 'DESC'], 5);
 
         if ($this->isGranted('ROLE_MANAGER') || $this->isGranted('ROLE_HR') || $this->isGranted('ROLE_ADMIN')) {

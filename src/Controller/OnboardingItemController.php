@@ -25,8 +25,7 @@ final class OnboardingItemController extends AbstractController
         OnboardingProgressCalculator $progressCalculator
     ): RedirectResponse {
         $this->denyAccessUnlessGranted('ROLE_COLLABORATOR');
-
-        $this->ensureOwnership($task->getOnboarding()->getUser()->getId());
+		$this->ensureOwnership($task->getOnboarding()->getUser()->getId());
 
         $status = (string) $request->request->get('status');
 
@@ -54,8 +53,7 @@ final class OnboardingItemController extends AbstractController
         OnboardingProgressCalculator $progressCalculator
     ): RedirectResponse {
         $this->denyAccessUnlessGranted('ROLE_COLLABORATOR');
-
-        $this->ensureOwnership($training->getOnboarding()->getUser()->getId());
+		$this->ensureOwnership($training->getOnboarding()->getUser()->getId());
 
         $status = (string) $request->request->get('status');
 
@@ -83,8 +81,7 @@ final class OnboardingItemController extends AbstractController
         OnboardingProgressCalculator $progressCalculator
     ): RedirectResponse {
         $this->denyAccessUnlessGranted('ROLE_COLLABORATOR');
-
-        $this->ensureOwnership($software->getOnboarding()->getUser()->getId());
+		$this->ensureOwnership($software->getOnboarding()->getUser()->getId());
 
         $status = (string) $request->request->get('status');
 
@@ -103,12 +100,13 @@ final class OnboardingItemController extends AbstractController
         return $this->redirectToRoute('app_dashboard');
     }
 
-    private function ensureOwnership(?int $ownerId): void
-    {
-        $user = $this->getUser();
+	private function ensureOwnership(?int $ownerId): void
+	{
+		$user = $this->getUser();
 
-        if (!$user || !method_exists($user, 'getId') || $user->getId() !== $ownerId) {
-            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres données.');
-        }
-    }
+		if (!$user || !method_exists($user, 'getId') || $user->getId() !== $ownerId) {
+			throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres données.');
+		}
+	}
+
 }

@@ -48,14 +48,21 @@ final class OnboardingController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_onboarding_show', methods: ['GET'])]
-    public function show(Onboarding $onboarding): Response
-    {
-        $this->denyAccessUnlessGrantedAny(['ROLE_MANAGER', 'ROLE_HR', 'ROLE_ADMIN']);
+	public function show(Onboarding $onboarding): Response
+	{
+		if (
+			!$this->isGranted('ROLE_MANAGER')
+			&& !$this->isGranted('ROLE_HR')
+			&& !$this->isGranted('ROLE_ADMIN')
+			&& $onboarding->getUser()?->getId() !== $this->getUser()?->getId()
+		) {
+			throw $this->createAccessDeniedException('Accès refusé.');
+		}
 
-        return $this->render('onboarding/show.html.twig', [
-            'onboarding' => $onboarding,
-        ]);
-    }
+		return $this->render('onboarding/show.html.twig', [
+			'onboarding' => $onboarding,
+		]);
+	}
 
     #[Route('/{id}/task/new', name: 'app_onboarding_task_new', methods: ['GET', 'POST'])]
     public function newTask(Onboarding $onboarding, Request $request, EntityManagerInterface $entityManager): Response
