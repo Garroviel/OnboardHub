@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une tâche{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Ajouter une tâche</h1>
+        <p>Onboarding de {{ onboarding.user.fullName }}</p>
+    </section>
+
+    <article class="card" style="max-width: 760px;">
+        {{ form_start(form) }}
+            <div class="form-grid">
+                <div>
+                    {{ form_label(form.title) }}
+                    {{ form_widget(form.title) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status) }}
+                    {{ form_errors(form.status) }}
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                    {{ form_errors(form.description) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.priority) }}
+                    {{ form_widget(form.priority) }}
+                    {{ form_errors(form.priority) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.position) }}
+                    {{ form_widget(form.position) }}
+                    {{ form_errors(form.position) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.dueDate) }}
+                    {{ form_widget(form.dueDate) }}
+                    {{ form_errors(form.dueDate) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.assignedBy) }}
+                    {{ form_widget(form.assignedBy) }}
+                    {{ form_errors(form.assignedBy) }}
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <button type="submit">Ajouter la tâche</button>
+            </div>
+        {{ form_end(form) }}
+    </article>
+{% endblock %}

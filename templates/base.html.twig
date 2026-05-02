@@ -30,6 +30,11 @@
         </header>
 
         <main class="container page-content">
+			{% for message in app.flashes('success') %}
+				<div class="alert-success">
+					{{ message }}
+				</div>
+			{% endfor %}
             {% block body %}{% endblock %}
         </main>
     </body>

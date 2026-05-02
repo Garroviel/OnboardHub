@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un logiciel{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Ajouter un logiciel</h1>
+        <p>Onboarding de {{ onboarding.user.fullName }}</p>
+    </section>
+
+    <article class="card" style="max-width: 760px;">
+        {{ form_start(form) }}
+            <div class="form-grid">
+                <div>
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                    {{ form_errors(form.name) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status) }}
+                    {{ form_errors(form.status) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.installUrl) }}
+                    {{ form_widget(form.installUrl) }}
+                    {{ form_errors(form.installUrl) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.position) }}
+                    {{ form_widget(form.position) }}
+                    {{ form_errors(form.position) }}
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <button type="submit">Ajouter le logiciel</button>
+            </div>
+        {{ form_end(form) }}
+    </article>
+{% endblock %}

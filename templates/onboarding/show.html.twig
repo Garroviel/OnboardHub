@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail onboarding{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Onboarding de {{ onboarding.user.fullName }}</h1>
+        <p>Vue manager / RH.</p>
+    </section>
+
+    <article class="card">
+        <dl class="details-list">
+            <div>
+                <dt>Collaborateur</dt>
+                <dd>{{ onboarding.user.fullName }} ({{ onboarding.user.email }})</dd>
+            </div>
+            <div>
+                <dt>Statut</dt>
+                <dd>{{ onboarding.status.value }}</dd>
+            </div>
+            <div>
+                <dt>Progression</dt>
+                <dd>{{ onboarding.progressPercent }}%</dd>
+            </div>
+            <div>
+                <dt>Date de début</dt>
+                <dd>{{ onboarding.startDate|date('d/m/Y') }}</dd>
+            </div>
+            <div>
+                <dt>Date cible</dt>
+                <dd>
+                    {% if onboarding.dueDate %}
+                        {{ onboarding.dueDate|date('d/m/Y') }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+
+        <p style="margin-top: 1rem;">
+            <a href="{{ path('app_onboarding_task_new', {id: onboarding.id}) }}">Ajouter une tâche</a> |
+            <a href="{{ path('app_onboarding_training_new', {id: onboarding.id}) }}">Ajouter une formation</a> |
+            <a href="{{ path('app_onboarding_software_new', {id: onboarding.id}) }}">Ajouter un logiciel</a>
+        </p>
+    </article>
+
+    <section class="stack">
+        <article class="card">
+            <h2>Tâches</h2>
+            {% if onboarding.tasks is not empty %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Priorité</th>
+                            <th>Assignée par</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in onboarding.tasks %}
+                            <tr>
+                                <td>{{ task.title }}</td>
+                                <td>{{ task.status.value }}</td>
+                                <td>{{ task.priority }}</td>
+                                <td>{% if task.assignedBy %}{{ task.assignedBy.fullName }}{% else %}—{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune tâche.</p>
+            {% endif %}
+        </article>
+
+        <article class="card">
+            <h2>Formations</h2>
+            {% if onboarding.trainings is not empty %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Titre</th>
+                            <th>Statut</th>
+                            <th>Lien</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for training in onboarding.trainings %}
+                            <tr>
+                                <td>{{ training.title }}</td>
+                                <td>{{ training.status.value }}</td>
+                                <td>
+                                    {% if training.url %}
+                                        <a href="{{ training.url }}" target="_blank" rel="noopener noreferrer">Ouvrir</a>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucune formation.</p>
+            {% endif %}
+        </article>
+
+        <article class="card">
+            <h2>Logiciels</h2>
+            {% if onboarding.softwareItems is not empty %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Statut</th>
+                            <th>Lien</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for software in onboarding.softwareItems %}
+                            <tr>
+                                <td>{{ software.name }}</td>
+                                <td>{{ software.status.value }}</td>
+                                <td>
+                                    {% if software.installUrl %}
+                                        <a href="{{ software.installUrl }}" target="_blank" rel="noopener noreferrer">Installer</a>
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucun logiciel.</p>
+            {% endif %}
+        </article>
+    </section>
+{% endblock %}
