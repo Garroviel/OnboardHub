@@ -25,6 +25,16 @@ services:
       - "3307:3306"
     volumes:
       - onboardhub_db_data:/var/lib/mysql
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    container_name: onboardhub_keycloak
+    command: start-dev
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
 
 volumes:
   onboardhub_db_data:

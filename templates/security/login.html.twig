@@ -14,25 +14,10 @@
                 {{ error.messageKey|trans(error.messageData, 'security') }}
             </div>
         {% endif %}
-
-        <form method="post" action="{{ path('app_login') }}">
-            <div>
-                <label for="email">Email</label><br>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="{{ last_username }}"
-                    required
-                    autofocus
-                    style="width: 100%; margin-top: 0.35rem; padding: 0.7rem;"
-                >
-            </div>
-
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
             <div style="margin-top: 1rem;">
-                <button type="submit">Se connecter</button>
+				<a href="{{ path('connect_keycloak_start') }}">
+					Se connecter avec Keycloak
+				</a>
             </div>
         </form>
 

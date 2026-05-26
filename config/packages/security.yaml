@@ -16,13 +16,15 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\LoginFormAuthenticator
-            logout:
-                path: app_logout
-                target: app_login
+            custom_authenticator: 
+              - App\Security\KeycloakAuthenticator
+            # logout:
+            #     path: app_logout
+            #     target: app_keycloak_logout
 
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/keycloak, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
         - { path: ^/, roles: ROLE_COLLABORATOR }
 
