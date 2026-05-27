@@ -61,9 +61,15 @@ Notifications
 Historique d’audit avancé
 
 
-## Authentification
+## Authentification Keycloak / OpenID Connect
 
-L'application utilise Keycloak via OpenID Connect.
+L'application utilise Keycloak comme fournisseur d'identité OpenID Connect.
+
+### Lancer l’environnement
+
+```bash
+docker compose up -d --build
+```
 
 Provider local :
 
@@ -134,3 +140,14 @@ KEYCLOAK_CLIENT_ID=onboardhub-symfony
 KEYCLOAK_CLIENT_SECRET=change_me
 KEYCLOAK_AUTH_SERVER_URL=http://127.0.0.1:8080
 KEYCLOAK_REALM=onboardhub
+```
+
+
+## Résultats actuels
+
+- Tests automatisés : OK
+- Nombre de tests : 4
+- PHPUnit : 12.5.13
+- CI GitHub Actions : OK
+- Workflow : `.github/workflows/ci.yml`
+- Tests exécutés automatiquement à chaque push / pull request
