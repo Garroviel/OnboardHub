@@ -1,3 +1,5 @@
+![CI](https://github.com/TON_USER/TON_REPO/actions/workflows/ci.yml/badge.svg)
+
 # OnboardHub
 
 Application web Symfony pour gérer l'onboarding collaborateur.
@@ -57,3 +59,78 @@ docker compose exec app php bin/console doctrine:fixtures:load
 Templates onboarding
 Notifications
 Historique d’audit avancé
+
+
+## Authentification
+
+L'application utilise Keycloak via OpenID Connect.
+
+Provider local :
+
+- URL : http://127.0.0.1:8080
+- Realm : onboardhub
+- Client : onboardhub-symfony
+
+La connexion Symfony se fait via le champ OIDC `sub`, stocké dans `users.external_id`.
+
+## Configuration Keycloak locale
+
+URL admin :
+
+```text
+http://127.0.0.1:8080
+
+compte admin locale admin / admin
+
+Realm
+
+Créer un realm :
+
+onboardhub
+Client
+
+Créer un client OpenID Connect :
+
+Client ID: onboardhub-symfony
+Client authentication: ON
+Standard flow: ON
+Direct access grants: OFF
+
+Redirect URIs :
+
+http://127.0.0.1:8000/connect/keycloak/check
+http://localhost:8000/connect/keycloak/check
+
+Post logout redirect URIs :
+
+http://127.0.0.1:8000/login
+http://localhost:8000/login
+
+Web origins :
+
+http://127.0.0.1:8000
+http://localhost:8000
+Users de test
+
+Créer les utilisateurs suivants dans Keycloak :
+
+collab@onboardhub.local
+manager@onboardhub.local
+rh@onboardhub.local
+
+Pour chaque user :
+
+Email verified: ON
+mot de passe non temporaire
+
+---
+
+# Étape 19 — Ajouter `.env` propre
+
+Dans `.env`, garde des valeurs génériques :
+
+```env
+KEYCLOAK_CLIENT_ID=onboardhub-symfony
+KEYCLOAK_CLIENT_SECRET=change_me
+KEYCLOAK_AUTH_SERVER_URL=http://127.0.0.1:8080
+KEYCLOAK_REALM=onboardhub
