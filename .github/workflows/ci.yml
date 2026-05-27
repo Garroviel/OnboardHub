@@ -12,7 +12,7 @@ jobs:
       mariadb:
         image: mariadb:12.1
         env:
-          MARIADB_DATABASE: onboardhub_test
+          MARIADB_DATABASE: onboardhub
           MARIADB_USER: onboardhub
           MARIADB_PASSWORD: onboardhub
           MARIADB_ROOT_PASSWORD: root
@@ -26,7 +26,7 @@ jobs:
 
     env:
       APP_ENV: test
-      DATABASE_URL: mysql://onboardhub:onboardhub@127.0.0.1:3306/onboardhub_test?serverVersion=mariadb-12.1.2&charset=utf8mb4
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/onboardhub?serverVersion=mariadb-12.1.2&charset=utf8mb4
       KEYCLOAK_CLIENT_ID: onboardhub-symfony
       KEYCLOAK_CLIENT_SECRET: test
       KEYCLOAK_AUTH_SERVER_URL: http://127.0.0.1:8080
