@@ -124,6 +124,8 @@ collab@onboardhub.local
 manager@onboardhub.local
 rh@onboardhub.local
 
+les mots de passes des comptes de test sont : Password
+
 Pour chaque user :
 
 Email verified: ON
