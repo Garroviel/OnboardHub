@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard manager / RH{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Bonjour {{ user.fullName }}</h1>
+        <p>Suivi global des onboardings en cours.</p>
+		<p style="margin-top: 1rem;">
+			<a href="{{ path('app_onboarding_new') }}">Créer un onboarding</a>
+		</p>
+    </section>
+
+    <section class="grid">
+        <article class="card">
+            <h2>Onboardings récents</h2>
+
+            {% if onboardings is not empty %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Collaborateur</th>
+                            <th>Statut</th>
+                            <th>Progression</th>
+                            <th>Date début</th>
+                            <th>Date cible</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for onboarding in onboardings %}
+                            <tr>
+                                <td>
+									<a href="{{ path('app_onboarding_show', {id: onboarding.id}) }}">
+										{{ onboarding.user.fullName }}
+									</a>
+								</td>
+                                <td>{{ onboarding.status.value }}</td>
+                                <td>{{ onboarding.progressPercent }}%</td>
+                                <td>{{ onboarding.startDate|date('d/m/Y') }}</td>
+                                <td>
+                                    {% if onboarding.dueDate %}
+                                        {{ onboarding.dueDate|date('d/m/Y') }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Aucun onboarding trouvé.</p>
+            {% endif %}
+        </article>
+
+        <article class="card">
+            <h2>Veille tech</h2>
+
+            {% if latestArticles is not empty %}
+                <ul class="simple-list">
+                    {% for article in latestArticles %}
+                        <li>
+                            <a href="{{ article.url }}" target="_blank" rel="noopener noreferrer">
+                                {{ article.title }}
+                            </a>
+                            <small>
+                                {{ article.source }}
+                                {% if article.score is not null %}· score {{ article.score }}{% endif %}
+                            </small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Aucun article en cache pour le moment.</p>
+            {% endif %}
+        </article>
+    </section>
+{% endblock %}

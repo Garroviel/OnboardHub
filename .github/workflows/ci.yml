@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:12.1
+        env:
+          MARIADB_DATABASE: onboardhub
+          MARIADB_USER: onboardhub
+          MARIADB_PASSWORD: onboardhub
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      APP_ENV: test
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/onboardhub?serverVersion=mariadb-12.1.2&charset=utf8mb4
+      KEYCLOAK_CLIENT_ID: onboardhub-symfony
+      KEYCLOAK_CLIENT_SECRET: test
+      KEYCLOAK_AUTH_SERVER_URL: http://127.0.0.1:8080
+      KEYCLOAK_REALM: onboardhub
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_mysql, zip
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Validate container
+        run: php bin/console lint:container
+
+      - name: Prepare test database
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Run tests
+        run: php bin/phpunit

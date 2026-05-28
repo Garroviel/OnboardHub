@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un onboarding{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <h1>Créer un onboarding</h1>
+        <p>Créer un onboarding manuel pour un collaborateur.</p>
+    </section>
+
+    <article class="card" style="max-width: 760px;">
+        {{ form_start(form) }}
+            <div class="form-grid">
+                <div>
+                    {{ form_label(form.user) }}
+                    {{ form_widget(form.user) }}
+                    {{ form_errors(form.user) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.startDate) }}
+                    {{ form_widget(form.startDate) }}
+                    {{ form_errors(form.startDate) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.dueDate) }}
+                    {{ form_widget(form.dueDate) }}
+                    {{ form_errors(form.dueDate) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status) }}
+                    {{ form_errors(form.status) }}
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <button type="submit">Créer l’onboarding</button>
+            </div>
+        {{ form_end(form) }}
+    </article>
+{% endblock %}

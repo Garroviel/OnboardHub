@@ -1,0 +1,12 @@
+knpu_oauth2_client:
+    clients:
+        keycloak:
+            type: generic
+            provider_class: Stevenmaguire\OAuth2\Client\Provider\Keycloak
+            client_id: '%env(KEYCLOAK_CLIENT_ID)%'
+            client_secret: '%env(KEYCLOAK_CLIENT_SECRET)%'
+            redirect_route: connect_keycloak_check
+            redirect_params: {}
+            provider_options:
+                authServerUrl: '%env(KEYCLOAK_AUTH_SERVER_URL)%'
+                realm: '%env(KEYCLOAK_REALM)%'
