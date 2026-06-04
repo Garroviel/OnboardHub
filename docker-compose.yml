@@ -12,6 +12,9 @@ services:
       DATABASE_URL: "mysql://onboardhub:onboardhub@db:3306/onboardhub?serverVersion=mariadb-12.1.2&charset=utf8mb4"
     depends_on:
       - db
+      - keycloak
+    extra_hosts:
+      - "keycloak.127.0.0.1.nip.io:host-gateway"
 
   db:
     image: mariadb:12.1
@@ -25,16 +28,19 @@ services:
       - "3307:3306"
     volumes:
       - onboardhub_db_data:/var/lib/mysql
-  
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.4
     container_name: onboardhub_keycloak
-    command: start-dev
+    command: start-dev --hostname=http://keycloak.127.0.0.1.nip.io:8080
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     ports:
       - "8080:8080"
+    volumes:
+      - onboardhub_keycloak_data:/opt/keycloak/data
 
 volumes:
   onboardhub_db_data:
+  onboardhub_keycloak_data:
