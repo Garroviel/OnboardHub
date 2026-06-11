@@ -22,17 +22,31 @@ class OnboardingRepository extends ServiceEntityRepository
     //     */
     public function findLatestForUserWithItems(User $user): ?Onboarding
 	{
-		return $this->createQueryBuilder('o')
-			->leftJoin('o.tasks', 't')->addSelect('t')
-			->leftJoin('o.trainings', 'tr')->addSelect('tr')
-			->leftJoin('o.softwareItems', 's')->addSelect('s')
+		$latestOnboardingRow = $this->createQueryBuilder('o')
+			->select('o.id AS id')
 			->andWhere('o.user = :user')
 			->setParameter('user', $user)
 			->orderBy('o.createdAt', 'DESC')
-			->addOrderBy('t.position', 'ASC')
+			->setMaxResults(1)
+			->getQuery()
+			->getOneOrNullResult();
+
+		if (!$latestOnboardingRow) {
+			return null;
+		}
+
+		return $this->createQueryBuilder('o')
+			->leftJoin('o.tasks', 't')
+			->addSelect('t')
+			->leftJoin('o.trainings', 'tr')
+			->addSelect('tr')
+			->leftJoin('o.softwareItems', 's')
+			->addSelect('s')
+			->andWhere('o.id = :id')
+			->setParameter('id', $latestOnboardingRow['id'])
+			->orderBy('t.position', 'ASC')
 			->addOrderBy('tr.position', 'ASC')
 			->addOrderBy('s.position', 'ASC')
-			->setMaxResults(1)
 			->getQuery()
 			->getOneOrNullResult();
 	}
