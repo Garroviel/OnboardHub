@@ -3,31 +3,37 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <section class="page-header">
-        <h1>Connexion à OnboardHub</h1>
-        <p>Utilise un compte de test pour le MVP.</p>
+    <section class="login-page">
+        <div class="login-hero">
+            <div class="login-kicker">OnboardHub</div>
+
+            <h1>Connexion à OnboardHub</h1>
+
+            <p>
+                Accédez à votre espace d’onboarding via Keycloak.
+            </p>
+        </div>
+
+        <div class="login-card">
+            <a class="primary-action" href="{{ path('connect_keycloak_start') }}">
+                Se connecter avec Keycloak
+            </a>
+
+            <div class="login-separator"></div>
+
+            <div class="test-accounts">
+                <h2>Comptes de test</h2>
+
+                <ul>
+                    <li>collab@onboardhub.local</li>
+                    <li>manager@onboardhub.local</li>
+                    <li>rh@onboardhub.local</li>
+                </ul>
+
+                <p class="login-help">
+                    Mot de passe local : <strong>password</strong>
+                </p>
+            </div>
+        </div>
     </section>
-
-    <article class="card" style="max-width: 520px;">
-        {% if error %}
-            <div class="alert-error">
-                {{ error.messageKey|trans(error.messageData, 'security') }}
-            </div>
-        {% endif %}
-            <div style="margin-top: 1rem;">
-				<a href="{{ path('connect_keycloak_start') }}">
-					Se connecter avec Keycloak
-				</a>
-            </div>
-        </form>
-
-        <hr style="margin: 1.25rem 0;">
-
-        <p><strong>Comptes de test</strong></p>
-        <ul class="simple-list">
-            <li>collab@onboardhub.local</li>
-            <li>manager@onboardhub.local</li>
-            <li>rh@onboardhub.local</li>
-        </ul>
-    </article>
 {% endblock %}
