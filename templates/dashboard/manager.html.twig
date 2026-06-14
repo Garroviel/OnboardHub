@@ -6,9 +6,15 @@
     <section class="page-header">
         <h1>Bonjour {{ user.fullName }}</h1>
         <p>Suivi global des onboardings en cours.</p>
-		<p style="margin-top: 1rem;">
-			<a href="{{ path('app_onboarding_new') }}">Créer un onboarding</a>
-		</p>
+		<div class="page-actions">
+			<a href="{{ path('app_onboarding_new') }}" class="secondary-action">
+				Créer un onboarding
+			</a>
+
+			<a href="{{ path('app_collaborator_new') }}" class="primary-action compact-action">
+				Créer un collaborateur
+			</a>
+		</div>
     </section>
 
     <section class="grid">
