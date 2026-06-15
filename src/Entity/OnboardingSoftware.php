@@ -7,6 +7,8 @@ use App\Repository\OnboardingSoftwareRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OnboardingSoftwareRepository::class)]
 #[ORM\Table(name: 'onboarding_software')]
@@ -40,10 +42,17 @@ class OnboardingSoftware
     #[ORM\Column(options: ['unsigned' => true])]
     private ?int $position = null;
 
+	/**
+	 * @var Collection<int, OnboardingComment>
+	 */
+	#[ORM\OneToMany(targetEntity: OnboardingComment::class, mappedBy: 'software', orphanRemoval: true)]
+	private Collection $comments;
+
     public function __construct()
     {
         $this->status = SoftwareStatus::TODO;
         $this->position = 0;
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -122,4 +131,33 @@ class OnboardingSoftware
 
         return $this;
     }
+
+	/**
+	 * @return Collection<int, OnboardingComment>
+	 */
+	public function getComments(): Collection
+	{
+		return $this->comments;
+	}
+
+	public function addComment(OnboardingComment $comment): static
+	{
+		if (!$this->comments->contains($comment)) {
+			$this->comments->add($comment);
+			$comment->setSoftware($this);
+		}
+
+		return $this;
+	}
+
+	public function removeComment(OnboardingComment $comment): static
+	{
+		if ($this->comments->removeElement($comment)) {
+			if ($comment->getSoftware() === $this) {
+				$comment->setSoftware(null);
+			}
+		}
+
+		return $this;
+	}
 }
