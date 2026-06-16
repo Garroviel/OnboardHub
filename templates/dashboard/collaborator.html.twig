@@ -90,7 +90,13 @@
                         <tbody>
                             {% for task in onboarding.tasks %}
                                 <tr>
-                                    <td>{{ task.title }}</td>
+                                    <td>
+										<strong>{{ task.title }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: task,
+											route: 'app_onboarding_task_comment'
+										} %}
+									</td>
 									<td>
 										<form method="post" action="{{ path('app_onboarding_task_update_status', {id: task.id}) }}">
 											<select name="status">
@@ -140,7 +146,13 @@
                         <tbody>
                             {% for training in onboarding.trainings %}
                                 <tr>
-                                    <td>{{ training.title }}</td>
+                                    <td>
+										<strong>{{ training.title }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: training,
+											route: 'app_onboarding_training_comment'
+										} %}
+									</td>
 									<td>
 										<form method="post" action="{{ path('app_onboarding_training_update_status', {id: training.id}) }}">
 											<select name="status">
@@ -184,7 +196,13 @@
                         <tbody>
                             {% for software in onboarding.softwareItems %}
                                 <tr>
-                                    <td>{{ software.name }}</td>
+                                    <td>
+										<strong>{{ software.name }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: software,
+											route: 'app_onboarding_software_comment'
+										} %}
+									</td>
                                     <td>
 										<form method="post" action="{{ path('app_onboarding_software_update_status', {id: software.id}) }}">
 											<select name="status">

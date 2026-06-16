@@ -61,7 +61,13 @@
                     <tbody>
                         {% for task in onboarding.tasks %}
                             <tr>
-                                <td>{{ task.title }}</td>
+                                <td>
+									<strong>{{ task.title }}</strong>
+									{% include 'onboarding/_comments.html.twig' with {
+										item: task,
+										route: 'app_onboarding_task_comment'
+									} %}
+								</td>
                                 <td>{{ task.status.value }}</td>
                                 <td>{{ task.priority }}</td>
                                 <td>{% if task.assignedBy %}{{ task.assignedBy.fullName }}{% else %}—{% endif %}</td>
@@ -88,7 +94,13 @@
                     <tbody>
                         {% for training in onboarding.trainings %}
                             <tr>
-                                <td>{{ training.title }}</td>
+                                <td>
+									<strong>{{ training.title }}</strong>
+									{% include 'onboarding/_comments.html.twig' with {
+										item: training,
+										route: 'app_onboarding_training_comment'
+									} %}
+								</td>
                                 <td>{{ training.status.value }}</td>
                                 <td>
                                     {% if training.url %}
@@ -120,7 +132,13 @@
                     <tbody>
                         {% for software in onboarding.softwareItems %}
                             <tr>
-                                <td>{{ software.name }}</td>
+                                <td>
+									<strong>{{ software.name }}</strong>
+									{% include 'onboarding/_comments.html.twig' with {
+										item: software,
+										route: 'app_onboarding_software_comment'
+									} %}
+								</td>
                                 <td>{{ software.status.value }}</td>
                                 <td>
                                     {% if software.installUrl %}
