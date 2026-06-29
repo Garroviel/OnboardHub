@@ -7,6 +7,8 @@ use App\Repository\OnboardingTrainingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OnboardingTrainingRepository::class)]
 #[ORM\Table(name: 'onboarding_training')]
@@ -40,10 +42,17 @@ class OnboardingTraining
     #[ORM\Column(options: ['unsigned' => true])]
     private ?int $position = null;
 
+	/**
+	 * @var Collection<int, OnboardingComment>
+	 */
+	#[ORM\OneToMany(targetEntity: OnboardingComment::class, mappedBy: 'training', orphanRemoval: true)]
+	private Collection $comments;
+
     public function __construct()
     {
         $this->status = TrainingStatus::TODO;
         $this->position = 0;
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -122,4 +131,33 @@ class OnboardingTraining
 
         return $this;
     }
+
+	/**
+	 * @return Collection<int, OnboardingComment>
+	 */
+	public function getComments(): Collection
+	{
+		return $this->comments;
+	}
+
+	public function addComment(OnboardingComment $comment): static
+	{
+		if (!$this->comments->contains($comment)) {
+			$this->comments->add($comment);
+			$comment->setTraining($this);
+		}
+
+		return $this;
+	}
+
+	public function removeComment(OnboardingComment $comment): static
+	{
+		if ($this->comments->removeElement($comment)) {
+			if ($comment->getTraining() === $this) {
+				$comment->setTraining(null);
+			}
+		}
+
+		return $this;
+	}
 }

@@ -7,6 +7,8 @@ use App\Repository\OnboardingTaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: OnboardingTaskRepository::class)]
 #[ORM\Table(name: 'onboarding_task')]
@@ -48,11 +50,18 @@ class OnboardingTask
     #[ORM\Column(options: ['unsigned' => true])]
     private ?int $position = null;
 
+	/**
+	 * @var Collection<int, OnboardingComment>
+	 */
+	#[ORM\OneToMany(targetEntity: OnboardingComment::class, mappedBy: 'task', orphanRemoval: true)]
+	private Collection $comments;
+
     public function __construct()
     {
         $this->status = TaskStatus::TODO;
         $this->priority = 3;
         $this->position = 0;
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -167,4 +176,33 @@ class OnboardingTask
 
         return $this;
     }
+
+	/**
+	 * @return Collection<int, OnboardingComment>
+	 */
+	public function getComments(): Collection
+	{
+		return $this->comments;
+	}
+
+	public function addComment(OnboardingComment $comment): static
+	{
+		if (!$this->comments->contains($comment)) {
+			$this->comments->add($comment);
+			$comment->setTask($this);
+		}
+
+		return $this;
+	}
+
+	public function removeComment(OnboardingComment $comment): static
+	{
+		if ($this->comments->removeElement($comment)) {
+			if ($comment->getTask() === $this) {
+				$comment->setTask(null);
+			}
+		}
+
+		return $this;
+	}
 }

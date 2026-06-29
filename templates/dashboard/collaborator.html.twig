@@ -13,36 +13,42 @@
             <h2>Mon onboarding</h2>
 
             {% if onboarding %}
-                <dl class="details-list">
-                    <div>
-                        <dt>Statut</dt>
-                        <dd>{{ onboarding.status.value }}</dd>
-                    </div>
-                    <div>
-                        <dt>Progression</dt>
-                        <dd>{{ onboarding.progressPercent }}%</dd>
-                    </div>
-                    <div>
-                        <dt>Date de début</dt>
-                        <dd>{{ onboarding.startDate|date('d/m/Y') }}</dd>
-                    </div>
-                    <div>
-                        <dt>Date cible</dt>
-                        <dd>
-                            {% if onboarding.dueDate %}
-                                {{ onboarding.dueDate|date('d/m/Y') }}
-                            {% else %}
-                                —
-                            {% endif %}
-                        </dd>
-                    </div>
-                </dl>
+                <div class="stats-grid">
+					<div class="stat-card">
+						<span class="stat-label">Statut</span>
+						<strong class="stat-value">{{ onboarding.status.value }}</strong>
+					</div>
+
+					<div class="stat-card stat-card-progress">
+						<span class="stat-label">Progression</span>
+						<strong class="progress-value">{{ onboarding.progressPercent }}%</strong>
+						<div class="progress-track" aria-label="Progression onboarding">
+							<div class="progress-bar" style="width: {{ onboarding.progressPercent }}%;"></div>
+						</div>
+					</div>
+
+					<div class="stat-card">
+						<span class="stat-label">Date de début</span>
+						<strong class="stat-value">{{ onboarding.startDate|date('d/m/Y') }}</strong>
+					</div>
+
+					<div class="stat-card">
+						<span class="stat-label">Date cible</span>
+						<strong class="stat-value">
+							{% if onboarding.dueDate %}
+								{{ onboarding.dueDate|date('d/m/Y') }}
+							{% else %}
+								—
+							{% endif %}
+						</strong>
+					</div>
+				</div>
             {% else %}
                 <p>Aucun onboarding n’est encore associé à votre compte.</p>
             {% endif %}
         </article>
 
-        <article class="card">
+        <article class="card" id="watch">
             <h2>Veille tech</h2>
 
             {% if latestArticles is not empty %}
@@ -67,7 +73,7 @@
 
     {% if onboarding %}
         <section class="stack">
-            <article class="card">
+            <article class="card" id="tasks">
                 <h2>Tâches</h2>
 
                 {% if onboarding.tasks is not empty %}
@@ -84,7 +90,13 @@
                         <tbody>
                             {% for task in onboarding.tasks %}
                                 <tr>
-                                    <td>{{ task.title }}</td>
+                                    <td>
+										<strong>{{ task.title }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: task,
+											route: 'app_onboarding_task_comment'
+										} %}
+									</td>
 									<td>
 										<form method="post" action="{{ path('app_onboarding_task_update_status', {id: task.id}) }}">
 											<select name="status">
@@ -119,7 +131,7 @@
                 {% endif %}
             </article>
 
-            <article class="card">
+            <article class="card" id="trainings">
                 <h2>Formations</h2>
 
                 {% if onboarding.trainings is not empty %}
@@ -134,8 +146,23 @@
                         <tbody>
                             {% for training in onboarding.trainings %}
                                 <tr>
-                                    <td>{{ training.title }}</td>
-                                    <td>{{ training.status.value }}</td>
+                                    <td>
+										<strong>{{ training.title }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: training,
+											route: 'app_onboarding_training_comment'
+										} %}
+									</td>
+									<td>
+										<form method="post" action="{{ path('app_onboarding_training_update_status', {id: training.id}) }}">
+											<select name="status">
+												<option value="TODO" {% if training.status.value == 'TODO' %}selected{% endif %}>TODO</option>
+												<option value="IN_PROGRESS" {% if training.status.value == 'IN_PROGRESS' %}selected{% endif %}>IN_PROGRESS</option>
+												<option value="DONE" {% if training.status.value == 'DONE' %}selected{% endif %}>DONE</option>
+											</select>
+											<button type="submit">Mettre à jour</button>
+										</form>
+									</td>
                                     <td>
                                         {% if training.url %}
                                             <a href="{{ training.url }}" target="_blank" rel="noopener noreferrer">
@@ -154,7 +181,7 @@
                 {% endif %}
             </article>
 
-            <article class="card">
+            <article class="card" id="software">
                 <h2>Logiciels</h2>
 
                 {% if onboarding.softwareItems is not empty %}
@@ -169,7 +196,13 @@
                         <tbody>
                             {% for software in onboarding.softwareItems %}
                                 <tr>
-                                    <td>{{ software.name }}</td>
+                                    <td>
+										<strong>{{ software.name }}</strong>
+										{% include 'onboarding/_comments.html.twig' with {
+											item: software,
+											route: 'app_onboarding_software_comment'
+										} %}
+									</td>
                                     <td>
 										<form method="post" action="{{ path('app_onboarding_software_update_status', {id: software.id}) }}">
 											<select name="status">

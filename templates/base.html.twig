@@ -4,41 +4,69 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}OnboardHub{% endblock %}</title>
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}?v=20260612-comments">
     </head>
     <body>
-        <header class="site-header">
-            <div class="container header-inner">
-                <a href="{{ path('app_dashboard') }}" class="brand">OnboardHub</a>
+		<div class="app-shell">
+			{% if app.user %}
+				<aside class="sidebar">
+					<a href="{{ path('app_dashboard') }}" class="sidebar-brand">
+						<span class="brand-icon">OH</span>
+						<span>OnboardHub</span>
+					</a>
 
-                <nav class="main-nav" aria-label="Navigation principale">
-                    {% if app.user %}
-                        <a href="{{ path('app_dashboard') }}">Dashboard</a>
+					<nav class="sidebar-nav" aria-label="Navigation principale">
+						<a href="{{ path('app_dashboard') }}" class="sidebar-link active">Dashboard</a>
+						<a href="{{ path('app_dashboard') }}#tasks" class="sidebar-link">Mes tâches</a>
+						<a href="{{ path('app_dashboard') }}#trainings" class="sidebar-link">Formations</a>
+						<a href="{{ path('app_dashboard') }}#software" class="sidebar-link">Installations</a>
+						<a href="{{ path('app_dashboard') }}#watch" class="sidebar-link">Veille</a>
+					</nav>
 
-                        {% if is_granted('ROLE_MANAGER') or is_granted('ROLE_HR') or is_granted('ROLE_ADMIN') %}
-                            <span class="nav-badge">Pilotage</span>
-                        {% endif %}
+					<a href="{{ path('app_logout') }}" class="logout-button">Déconnexion</a>
+				</aside>
+			{% endif %}
 
-                        <span class="nav-user">
-                            {{ app.user.fullName }}
-							<small>
-								{{ app.user.roles|join(', ') }}
-							</small>
-                        </span>
+            <div class="main-area">
+				{% if app.user %}
+					<header class="topbar">
+						<form class="search-bar" role="search">
+							<input id="page-search" type="search" placeholder="Rechercher...">
+						</form>
 
-                        <a href="{{ path('app_logout') }}">Déconnexion</a>
-                    {% endif %}
-                </nav>
+                        <div class="topbar-actions">
+                            <span class="user-pill">
+                                <span class="avatar">{{ app.user.firstName|slice(0, 1) }}{{ app.user.lastName|slice(0, 1) }}</span>
+                                <span>
+                                    <strong>{{ app.user.fullName }}</strong>
+                                    <small>
+                                        {% if is_granted('ROLE_HR') %}
+                                            RH
+                                        {% elseif is_granted('ROLE_MANAGER') %}
+                                            Manager
+                                        {% elseif is_granted('ROLE_ADMIN') %}
+                                            Admin
+                                        {% else %}
+                                            Collaborateur
+                                        {% endif %}
+                                    </small>
+                                </span>
+                            </span>
+                        </div>
+                    </header>
+                {% endif %}
+
+                <main class="page-content">
+                    {% for message in app.flashes('success') %}
+                        <div class="alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {% block body %}{% endblock %}
+                </main>
             </div>
-        </header>
-
-        <main class="container page-content">
-			{% for message in app.flashes('success') %}
-				<div class="alert-success">
-					{{ message }}
-				</div>
-			{% endfor %}
-            {% block body %}{% endblock %}
-        </main>
+        </div>
+		<script src="{{ asset('js/app.js') }}?v=20260604-1" defer></script>
     </body>
 </html>

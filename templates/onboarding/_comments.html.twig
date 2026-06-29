@@ -1,0 +1,35 @@
+<div class="comments-box">
+    {% if item.comments is not empty %}
+        <ul class="comments-list">
+            {% for comment in item.comments %}
+                <li>
+                    <div class="comment-meta">
+                        <strong>{{ comment.author.fullName }}</strong>
+                        <span>{{ comment.createdAt|date('d/m/Y H:i') }}</span>
+                    </div>
+                    <p>{{ comment.message }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty-comments">Aucun commentaire.</p>
+    {% endif %}
+
+    <form method="post" action="{{ path(route, {id: item.id}) }}" class="comment-form">
+		<textarea
+			name="onboarding_comment[message]"
+			rows="2"
+			maxlength="2000"
+			placeholder="Ajouter un commentaire..."
+			required
+		></textarea>
+
+		<input
+			type="hidden"
+			name="onboarding_comment[_token]"
+			value="{{ csrf_token('onboarding_comment') }}"
+		>
+
+		<button type="submit">Commenter</button>
+	</form>
+</div>

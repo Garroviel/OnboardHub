@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Service\HackerNewsClient;
 use App\Service\TechArticleCacheManager;
+use App\Service\OnboardingProgressCalculator;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class DashboardController extends AbstractController
 {
@@ -18,7 +20,9 @@ final class DashboardController extends AbstractController
         OnboardingRepository $onboardingRepository,
         TechArticleRepository $techArticleRepository,
 		HackerNewsClient $hnClient,
-    	TechArticleCacheManager $cacheManager
+    	TechArticleCacheManager $cacheManager,
+		OnboardingProgressCalculator $progressCalculator,
+    	EntityManagerInterface $entityManager
     ): Response {
         $user = $this->getUser();
 
@@ -54,6 +58,11 @@ final class DashboardController extends AbstractController
         }
 
         $onboarding = $onboardingRepository->findLatestForUserWithItems($user);
+
+		if ($onboarding) {
+			$progressCalculator->recalculate($onboarding);
+			$entityManager->flush();
+		}
 
         return $this->render('dashboard/collaborator.html.twig', [
             'user' => $user,
