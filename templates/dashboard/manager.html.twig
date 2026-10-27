@@ -14,6 +14,11 @@
 			<a href="{{ path('app_collaborator_new') }}" class="primary-action compact-action">
 				Créer un collaborateur
 			</a>
+			{% if is_granted('ROLE_HR') or is_granted('ROLE_MANAGER') %}
+				<a href="{{ path('app_user_role_index') }}" class="primary-action compact-action">
+					Gérer les rôles
+				</a>
+			{% endif %}
 		</div>
     </section>
 

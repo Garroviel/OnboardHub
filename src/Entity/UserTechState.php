@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'user_tech_state')]
 #[ORM\UniqueConstraint(name: 'uq_state_user_article', columns: ['user_id', 'article_id'])]
 class UserTechState
+
+// joue aussi le rôle d’entité d’association entre User et TechArticle.
+// Cette entité mémorise l’état d’un article pour un utilisateur : lu ou non, sauvegardé ou non, avec les dates correspondantes.
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -119,3 +122,18 @@ class UserTechState
         return $this;
     }
 }
+
+
+// Lorsque la relation entre deux entités contient elle-même des informations métier, on la transforme généralement en véritable entité.
+// Le modèle est donc :
+// User
+//   1
+//   |
+//   N
+// UserTechState
+//   N
+//   |
+//   1
+// TechArticle
+
+// Cela revient conceptuellement à une relation plusieurs-à-plusieurs entre utilisateurs et articles
