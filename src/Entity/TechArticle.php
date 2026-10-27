@@ -14,6 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'uq_article_source_external', columns: ['source', 'external_id'])]
 class TechArticle
 {
+
+	// ORM	Mapping entre PHP et la base
+	// Assert	Validation des données dans Symfony
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -190,4 +194,6 @@ class TechArticle
 
         return $this;
     }
+
+	// TechArticle est une entité Doctrine liée à la table tech_article. Les attributs ORM définissent le mapping de la base, tandis que les attributs Assert définissent la validation Symfony. Un article peut être associé à plusieurs UserTechState, ce qui permet de mémoriser séparément pour chaque utilisateur si l’article est lu ou sauvegardé.
 }

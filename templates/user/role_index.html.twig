@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des rôles{% endblock %}
+
+{% block body %}
+
+    <h1>Gestion des rôles</h1>
+
+    <p>
+        Gérez les rôles des collaborateurs de l'application.
+    </p>
+
+    {% if users is empty %}
+
+        <p>Aucun utilisateur disponible.</p>
+
+    {% else %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle actuel</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for user in users %}
+
+                <tr>
+                    <td>
+                        {{ user.firstName }}
+                        {{ user.lastName }}
+                    </td>
+
+                    <td>
+                        {{ user.email }}
+                    </td>
+
+                    <td>
+                        {{ user.role.value }}
+                    </td>
+
+                    <td>
+                        <a href="{{ path('app_user_role_edit', {
+                            id: user.id
+                        }) }}">
+                            Modifier le rôle
+                        </a>
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+        </table>
+
+    {% endif %}
+
+    <a href="{{ path('app_dashboard') }}">
+        Retour au dashboard
+    </a>
+
+{% endblock %}
